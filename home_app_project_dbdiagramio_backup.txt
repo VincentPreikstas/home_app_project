@@ -1,0 +1,70 @@
+Website: https://dbdiagram.io/home
+
+
+
+Table "hap"."recuring_date" {
+  "recuring_date_id" INT [not null, increment]
+  "recuring_date" DATE [unique, not null]
+
+Indexes {
+  recuring_date_id [pk]
+}
+}
+
+Table "hap"."tag" {
+  "tag_name" VARCHAR(255) [unique, not null]
+  "tag_desc" VARCHAR(2000)
+  "tag_id" INT [not null, increment]
+  "tag_created_date" DATETIME [not null, default: `GETDATE()`]
+
+Indexes {
+  tag_id [pk]
+}
+}
+
+Table "hap"."task" {
+  "task_name" VARCHAR(255) [unique, not null]
+  "task_desc" VARCHAR(2000)
+  "task_id" INT [not null, increment]
+  "task_created_date" DATETIME [not null, default: `GETDATE()`]
+  "projected_days_to_complete_amount" INT [default: 7]
+
+Indexes {
+  task_id [pk]
+}
+}
+
+Table "hap"."task_recuring_date_association" {
+  "task_id" INT [not null]
+  "recuring_date_id" INT [not null]
+
+Indexes {
+  (task_id, recuring_date_id) [pk]
+}
+}
+
+Table "hap"."task_tag_association" {
+  "tag_id" INT [not null]
+  "task_id" INT [not null]
+
+Indexes {
+  (tag_id, task_id) [pk]
+}
+}
+
+Table "hap"."single_date" {
+  "task_id" INT [not null]
+  "single_date_created_date" DATETIME [not null, default: `GETDATE()`]
+  "status" VARCHAR(255) [not null, default: "incomplete"]
+  "scheduled_date" DATE [not null]
+}
+
+Ref:"hap"."task"."task_id" < "hap"."task_recuring_date_association"."task_id"
+
+Ref:"hap"."recuring_date"."recuring_date_id" < "hap"."task_recuring_date_association"."recuring_date_id"
+
+Ref:"hap"."tag"."tag_id" < "hap"."task_tag_association"."tag_id"
+
+Ref:"hap"."task"."task_id" < "hap"."task_tag_association"."task_id"
+
+Ref:"hap"."task"."task_id" < "hap"."single_date"."task_id"
