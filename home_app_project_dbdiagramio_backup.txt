@@ -2,12 +2,12 @@ Website: https://dbdiagram.io/home
 
 
 
-Table "hap"."recuring_date" {
-  "recuring_date_id" INT [not null, increment]
-  "recuring_date" DATE [unique, not null]
+Table "hap"."recurring_date" {
+  "recurring_date_id" INT [not null, increment]
+  "recurring_date" DATE [unique, not null]
 
 Indexes {
-  recuring_date_id [pk]
+  recurring_date_id [pk]
 }
 }
 
@@ -34,12 +34,12 @@ Indexes {
 }
 }
 
-Table "hap"."task_recuring_date_association" {
+Table "hap"."task_recurring_date_association" {
   "task_id" INT [not null]
-  "recuring_date_id" INT [not null]
+  "recurring_date_id" INT [not null]
 
 Indexes {
-  (task_id, recuring_date_id) [pk]
+  (task_id, recurring_date_id) [pk]
 }
 }
 
@@ -59,9 +59,9 @@ Table "hap"."single_date" {
   "scheduled_date" DATE [not null]
 }
 
-Ref:"hap"."task"."task_id" < "hap"."task_recuring_date_association"."task_id"
+Ref:"hap"."task"."task_id" < "hap"."task_recurring_date_association"."task_id"
 
-Ref:"hap"."recuring_date"."recuring_date_id" < "hap"."task_recuring_date_association"."recuring_date_id"
+Ref:"hap"."recurring_date"."recurring_date_id" < "hap"."task_recurring_date_association"."recurring_date_id"
 
 Ref:"hap"."tag"."tag_id" < "hap"."task_tag_association"."tag_id"
 
