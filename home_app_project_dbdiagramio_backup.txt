@@ -2,23 +2,15 @@ Website: https://dbdiagram.io/home
 
 
 
-Table "hap"."recurring_date" {
-  "recurring_date_id" INT [not null, increment]
-  "recurring_date" DATE [unique, not null]
+Table "hap"."user" {
+  "user_id" INT [not null, increment]
+  "first_name" VARCHAR(255)
+  "last_name" VARCHAR(255)
+  "email_address" VARCHAR(255)
+  "password_hash" VARCHAR(255)
 
 Indexes {
-  recurring_date_id [pk]
-}
-}
-
-Table "hap"."tag" {
-  "tag_name" VARCHAR(255) [unique, not null]
-  "tag_desc" VARCHAR(2000)
-  "tag_id" INT [not null, increment]
-  "tag_created_date" DATETIME [not null, default: `GETDATE()`]
-
-Indexes {
-  tag_id [pk]
+  user_id [pk]
 }
 }
 
@@ -26,20 +18,29 @@ Table "hap"."task" {
   "task_name" VARCHAR(255) [unique, not null]
   "task_desc" VARCHAR(2000)
   "task_id" INT [not null, increment]
+  "task_estimated_cost" MONEY [not null, default: 0]
+  "user_id" INT [not null]
   "task_created_date" DATETIME [not null, default: `GETDATE()`]
   "projected_days_to_complete_amount" INT [default: 7]
 
 Indexes {
   task_id [pk]
+  user_id [name: "user_id_index_task_table"]
+  (user_id, task_id) [name: "user_id_task_id_index_task_table"]
 }
 }
 
-Table "hap"."task_recurring_date_association" {
-  "task_id" INT [not null]
-  "recurring_date_id" INT [not null]
+Table "hap"."tag" {
+  "tag_name" VARCHAR(255) [unique, not null]
+  "tag_desc" VARCHAR(2000)
+  "tag_id" INT [not null, increment]
+  "user_id" INT [not null]
+  "tag_created_date" DATETIME [not null, default: `GETDATE()`]
 
 Indexes {
-  (task_id, recurring_date_id) [pk]
+  tag_id [pk]
+  user_id [name: "user_id_index_tag_table"]
+  (user_id, tag_id) [name: "user_id_tag_id_index_tag_table"]
 }
 }
 
@@ -49,6 +50,8 @@ Table "hap"."task_tag_association" {
 
 Indexes {
   (tag_id, task_id) [pk]
+  task_id [name: "task_id_index_task_tag_association_table"]
+  tag_id [name: "tag_id_index_task_tag_association_table"]
 }
 }
 
@@ -57,14 +60,75 @@ Table "hap"."single_date" {
   "single_date_created_date" DATETIME [not null, default: `GETDATE()`]
   "status" VARCHAR(255) [not null, default: "incomplete"]
   "scheduled_date" DATE [not null]
+
+Indexes {
+  task_id [name: "task_id_index_single_date_table"]
+  scheduled_date [name: "scheduled_date_index_single_date_table"]
+}
 }
 
-Ref:"hap"."task"."task_id" < "hap"."task_recurring_date_association"."task_id"
+Table "hap"."recurring_date" {
+  "recurring_date_id" INT [not null, increment]
+  "recurring_date" DATE [not null]
 
-Ref:"hap"."recurring_date"."recurring_date_id" < "hap"."task_recurring_date_association"."recurring_date_id"
+Indexes {
+  recurring_date_id [pk]
+}
+}
+
+Table "hap"."task_recurring_date_association" {
+  "task_id" INT [not null]
+  "recurring_date_id" INT [not null]
+
+Indexes {
+  (task_id, recurring_date_id) [pk]
+  task_id [name: "task_id_task_recurring_date_association_table"]
+}
+}
+
+Table "hap"."recurring_date_by_day" {
+  "recurring_date_by_day_id" INT [not null, increment]
+  "task_id" INT [not null]
+  "monday_flag" BIT [not null, default: 0]
+  "tuesday_flag" BIT [not null, default: 0]
+  "wednesday_flag" BIT [not null, default: 0]
+  "thursday_flag" BIT [not null, default: 0]
+  "friday_flag" BIT [not null, default: 0]
+  "saturday_flag" BIT [not null, default: 0]
+  "sunday_flag" BIT [not null, default: 0]
+  "week_skip_interval" INT [default: NULL]
+
+Indexes {
+  recurring_date_by_day_id [pk]
+}
+}
+
+Table "hap"."date_ranges_for_recurring_date_by_day" {
+  "recurring_date_by_day_id" INT [not null]
+  "the_start_date" datetime [not null]
+  "the_end_date" datetime [not null]
+
+Indexes {
+  recurring_date_by_day_id [name: "recurring_date_by_day_id_index_date_ranges_for_recurring_date_by_day_table"]
+  the_start_date [name: "the_start_date_index_date_ranges_for_recurring_date_by_day_table"]
+  the_end_date [name: "the_end_date_index_date_ranges_for_recurring_date_by_day_table"]
+}
+}
+
+Ref:"hap"."user"."user_id" < "hap"."task"."user_id"
+
+Ref:"hap"."user"."user_id" < "hap"."tag"."user_id"
 
 Ref:"hap"."tag"."tag_id" < "hap"."task_tag_association"."tag_id"
 
 Ref:"hap"."task"."task_id" < "hap"."task_tag_association"."task_id"
 
 Ref:"hap"."task"."task_id" < "hap"."single_date"."task_id"
+
+Ref:"hap"."task"."task_id" < "hap"."task_recurring_date_association"."task_id"
+
+Ref:"hap"."recurring_date"."recurring_date_id" < "hap"."task_recurring_date_association"."recurring_date_id"
+
+Ref:"hap"."task"."task_id" < "hap"."recurring_date_by_day"."task_id"
+
+Ref:"hap"."recurring_date_by_day"."recurring_date_by_day_id" < "hap"."date_ranges_for_recurring_date_by_day"."recurring_date_by_day_id"
