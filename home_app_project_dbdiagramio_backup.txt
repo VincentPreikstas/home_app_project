@@ -44,6 +44,34 @@ Indexes {
 }
 }
 
+Table "hap"."expense" {
+  "expense_id" INT [not null]
+  "expense_amount" MONEY [not null, default: 0]
+  "expense_description" VARCHAR(2000)
+  "expense_source_or_vender" VARCHAR(255)
+  "expense_source_uri" VARCHAR (1000)
+
+Indexes {
+  expense_id [pk]
+}
+}
+
+
+Table "hap"."task_expense_association"{
+  "expense_id" INT [not null]
+  "task_id" INT [not null]
+  "single_cost_bool" BIT [not null, default: 0]
+  "cost_every_occurance_bool" BIT [not null, default:0]
+  "cost_specific_num" INT [null, default: null]
+
+INDEXES {
+  (expense_id, task_id) [pk]
+  task_id [name: "task_id_task_expense_association_table"]
+  expense_id [name: "expense_id_task_expense_association_table"]
+}
+}
+
+
 Table "hap"."task_tag_association" {
   "tag_id" INT [not null]
   "task_id" INT [not null]
@@ -114,6 +142,10 @@ Indexes {
   the_end_date [name: "the_end_date_index_date_ranges_for_recurring_date_by_day_table"]
 }
 }
+
+Ref:"hap"."expense"."expense_id" < "hap"."task_expense_association"."expense_id"
+
+Ref:"hap"."task"."task_id" < "hap"."task_expense_association"."task_id"
 
 Ref:"hap"."user"."user_id" < "hap"."task"."user_id"
 
