@@ -1,0 +1,10 @@
+# Always use LF line endings (consistent across Windows dev and Linux deployment)
+* text=auto eol=lf
+
+# Explicitly binary files (no line ending conversion)
+*.png binary
+*.jpg binary
+*.jpeg binary
+*.gif binary
+*.ico binary
+*.xlsx binary

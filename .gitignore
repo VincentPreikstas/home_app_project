@@ -1,2 +1,15 @@
-angular/
-react_testing/
+# Dependencies (also handled by nested .gitignores)
+node_modules/
+
+# Build outputs
+dist/
+build/
+
+# Environment / secrets
+.env
+.env.local
+*.env
+
+# OS files
+.DS_Store
+Thumbs.db
