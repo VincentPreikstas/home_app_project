@@ -1,3 +1,6 @@
+# Session scratch files
+remember_llm_session_SCRATCH
+
 # Dependencies (also handled by nested .gitignores)
 node_modules/
 
